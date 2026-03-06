@@ -158,6 +158,7 @@ class _NavbarState extends State<Navbar> {
         setState(() {
           _selectedNav = label;
         });
+        // Esto avisa al main.dart qué botón se presionó
         widget.onNavItemTap(label); 
       },
       child: Column(

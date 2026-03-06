@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+// Importación de tus constantes de color
 import 'constants/colors.dart';
+// Importación de tus widgets personalizados
 import 'widgets/navbar.dart';
 import 'package:disney_app/widgets/carousel_section.dart';
 import 'package:disney_app/widgets/new_movies_section.dart';
+// Importación de datos y modelos
 import 'data/disney_data.dart';
 import 'models/movie_model.dart';
 
@@ -34,12 +37,12 @@ class MyApp extends StatelessWidget {
 }
 
 // ============================================================
-// PANTALLA PRINCIPAL
+// 1. PANTALLA PRINCIPAL (HOME)
 // ============================================================
 class HomeScreenWithCarousel extends StatelessWidget {
   const HomeScreenWithCarousel({Key? key}) : super(key: key);
 
-  // Función para navegar a la vista de detalles
+  // Función para navegar a la vista de detalles de una película
   void _navigateToDetails(BuildContext context, DisneyContent movie) {
     Navigator.push(
       context,
@@ -49,9 +52,18 @@ class HomeScreenWithCarousel extends StatelessWidget {
     );
   }
 
+  // Función para navegar al catálogo (Redireccionamiento desde Navbar)
+  void _navigateToCatalog(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const CatalogPage(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Obtener películas destacadas y todas las películas del archivo de datos
     final featuredMovies = DisneyData.getFeatured();
     final allMovies = DisneyData.allContent;
 
@@ -60,83 +72,149 @@ class HomeScreenWithCarousel extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // BARRA DE NAVEGACIÓN
+            // BARRA DE NAVEGACIÓN CON LÓGICA DE REDIRECCIÓN
             Navbar(
               onSearchTap: () {},
-              onNavItemTap: (navItem) {},
+              onNavItemTap: (navItem) {
+                // Si el usuario hace clic en Películas (o Movies según tu idioma en data)
+                if (navItem == 'Películas' || navItem == 'Movies') {
+                  _navigateToCatalog(context);
+                }
+              },
             ),
 
-            // CARRUSEL SUPERIOR
+            // SECCIÓN DE CARRUSEL (PRINCIPAL)
             CarouselSection(
               contents: featuredMovies,
               onContentSelected: (content) => _navigateToDetails(context, content),
             ),
 
-            // SECCIÓN DE PELÍCULAS NUEVAS (CON FLECHAS)
+            // SECCIÓN DE PELÍCULAS NUEVAS (CON LAS FLECHAS LATERALES)
             NewMoviesSection(
               contents: allMovies,
               onContentSelected: (content) => _navigateToDetails(context, content),
             ),
 
-            // FOOTER O PIE DE PÁGINA
-            Container(
-              width: double.infinity,
-              color: AppColors.darkBg2,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 60,
-                vertical: 60,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'DISNEY',
-                    style: TextStyle(
-                      color: AppColors.disney_blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      letterSpacing: 2,
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  const Text(
-                    '© 2024 Disney. Todos los derechos reservados. El contenido de esta página es para fines de práctica de desarrollo.',
-                    style: TextStyle(
-                      color: AppColors.grey,
-                      fontSize: 12,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      _footerLink('Política de Privacidad'),
-                      _footerLink('Acuerdo de Suscripción'),
-                      _footerLink('Ayuda'),
-                      _footerLink('Dispositivos Compatibles'),
-                    ],
-                  )
-                ],
-              ),
-            ),
+            // PIE DE PÁGINA (FOOTER)
+            _buildFooter(),
           ],
         ),
       ),
     );
   }
 
-  Widget _footerLink(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 20),
-      child: Text(
-        text,
-        style: const TextStyle(color: AppColors.lightGrey, fontSize: 11),
+  Widget _buildFooter() {
+    return Container(
+      width: double.infinity,
+      color: AppColors.darkBg2,
+      padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 60),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'DISNEY',
+            style: TextStyle(
+              color: AppColors.disney_blue,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              letterSpacing: 2,
+            ),
+          ),
+          const SizedBox(height: 15),
+          const Text(
+            '© 2024 Disney. Todos los derechos reservados. Aplicación desarrollada para fines educativos.',
+            style: TextStyle(color: AppColors.grey, fontSize: 12),
+          ),
+        ],
       ),
     );
   }
 }
 
 // ============================================================
-// NUEVA VISTA: PÁGINA DE DETALLES FINALIZADA
+// 2. VISTA DE CATÁLOGO (CON SINGLE CHILD SCROLL VIEW)
+// ============================================================
+class CatalogPage extends StatelessWidget {
+  const CatalogPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final allMovies = DisneyData.allContent;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          "CATÁLOGO COMPLETO",
+          style: TextStyle(color: Colors.white, fontSize: 16, letterSpacing: 2),
+        ),
+      ),
+      body: SingleChildScrollView( // <-- Scroll solicitado
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Todas las Películas y Series",
+              style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 30),
+            // Usamos un Wrap para crear una cuadrícula flexible
+            Wrap(
+              spacing: 20,
+              runSpacing: 30,
+              children: allMovies.map((movie) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => DetailsPage(movie: movie)),
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 170,
+                        height: 250,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          image: DecorationImage(
+                            image: NetworkImage(movie.poster),
+                            fit: BoxFit.cover,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            )
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: 170,
+                        child: Text(
+                          movie.title,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// 3. VISTA DE DETALLES (FINALIZADA)
 // ============================================================
 class DetailsPage extends StatelessWidget {
   final DisneyContent movie;
@@ -147,13 +225,10 @@ class DetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
+      appBar: AppBar(backgroundColor: Colors.transparent),
       body: Stack(
         children: [
-          // Imagen de fondo (Backdrop)
+          // Fondo de la película (Backdrop)
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -164,7 +239,7 @@ class DetailsPage extends StatelessWidget {
               ),
             ),
           ),
-          // Capa de degradado para que el texto sea legible
+          // Degradado para legibilidad del texto
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -172,13 +247,13 @@ class DetailsPage extends StatelessWidget {
                 end: Alignment.centerRight,
                 colors: [
                   Colors.black.withOpacity(0.9),
-                  Colors.black.withOpacity(0.3),
+                  Colors.black.withOpacity(0.5),
                   Colors.transparent,
                 ],
               ),
             ),
           ),
-          // Contenido de la película
+          // Información de la película
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 60.0),
             child: Column(
@@ -203,54 +278,24 @@ class DetailsPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Text(movie.year, style: const TextStyle(color: Colors.white70)),
-                    const SizedBox(width: 15),
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white70),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        "${movie.rating} ★",
-                        style: const TextStyle(color: Colors.white70, fontSize: 12),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: 500,
-                  child: Text(
-                    movie.description,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      height: 1.5,
-                    ),
-                  ),
+                Text(
+                  movie.description,
+                  style: const TextStyle(color: Colors.white70, fontSize: 18, height: 1.5),
                 ),
                 const SizedBox(height: 30),
                 Text(
                   "Director: ${movie.director}",
-                  style: const TextStyle(
-                    color: AppColors.disney_gold,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: const TextStyle(color: AppColors.disney_gold, fontSize: 16),
                 ),
                 const SizedBox(height: 40),
                 ElevatedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.play_arrow, size: 30),
-                  label: const Text('REPRODUCIR'),
+                  label: const Text('REPRODUCIR AHORA'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                    textStyle: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
