@@ -40,6 +40,7 @@ class DisneyContent {
 }
 
 class ContentFilter {
+
   final String name;
   final String value;
   final bool isSelected;
@@ -57,4 +58,20 @@ class ContentFilter {
       isSelected: isSelected ?? this.isSelected,
     );
   }
+}
+
+class DisneyCharacter {
+  final String id;
+  final String name;
+  final String imageUrl;
+  final String description; // Opcional, para el Hero
+  final String movieTitle; // Película a la que pertenece
+
+  DisneyCharacter({
+    required this.id,
+    required this.name,
+    required this.imageUrl,
+    required this.movieTitle,
+    this.description = '',
+  });
 }

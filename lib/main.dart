@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-// Importación de tus constantes de color
+import 'package:cached_network_image/cached_network_image.dart';
+
+// Importaciones de tus archivos locales
 import 'constants/colors.dart';
-// Importación de tus widgets personalizados
 import 'widgets/navbar.dart';
-import 'package:disney_app/widgets/carousel_section.dart';
-import 'package:disney_app/widgets/new_movies_section.dart';
-// Importación de datos y modelos
+import 'widgets/carousel_section.dart';
+import 'widgets/new_movies_section.dart';
 import 'data/disney_data.dart';
 import 'models/movie_model.dart';
 
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Disney App',
+      title: 'Disney+ Clone',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
@@ -42,60 +42,52 @@ class MyApp extends StatelessWidget {
 class HomeScreenWithCarousel extends StatelessWidget {
   const HomeScreenWithCarousel({Key? key}) : super(key: key);
 
-  // Función para navegar a la vista de detalles de una película
   void _navigateToDetails(BuildContext context, DisneyContent movie) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => DetailsPage(movie: movie),
-      ),
+      MaterialPageRoute(builder: (context) => DetailsPage(movie: movie)),
     );
   }
 
-  // Función para navegar al catálogo (Redireccionamiento desde Navbar)
-  void _navigateToCatalog(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const CatalogPage(),
-      ),
-    );
+  void _navigateToCatalog(BuildContext context, String type) {
+    if (type == 'Personajes') {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const CharactersPage()));
+    } else {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => GenericCatalogPage(type: type)));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final featuredMovies = DisneyData.getFeatured();
-    final allMovies = DisneyData.allContent;
+    final allContent = DisneyData.allContent;
 
     return Scaffold(
-      backgroundColor: AppColors.darkBg2,
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // BARRA DE NAVEGACIÓN CON LÓGICA DE REDIRECCIÓN
+            // NAVBAR CON LÓGICA DE NAVEGACIÓN COMPLETA
             Navbar(
               onSearchTap: () {},
               onNavItemTap: (navItem) {
-                // Si el usuario hace clic en Películas (o Movies según tu idioma en data)
-                if (navItem == 'Películas' || navItem == 'Movies') {
-                  _navigateToCatalog(context);
+                if (navItem == 'Películas' || navItem == 'Series' || navItem == 'Personajes') {
+                  _navigateToCatalog(context, navItem);
                 }
               },
             ),
 
-            // SECCIÓN DE CARRUSEL (PRINCIPAL)
+            // CARRUSEL DE DESTACADOS
             CarouselSection(
               contents: featuredMovies,
               onContentSelected: (content) => _navigateToDetails(context, content),
             ),
 
-            // SECCIÓN DE PELÍCULAS NUEVAS (CON LAS FLECHAS LATERALES)
+            // SECCIÓN DE NOVEDADES
             NewMoviesSection(
-              contents: allMovies,
+              contents: allContent,
               onContentSelected: (content) => _navigateToDetails(context, content),
             ),
 
-            // PIE DE PÁGINA (FOOTER)
             _buildFooter(),
           ],
         ),
@@ -108,22 +100,106 @@ class HomeScreenWithCarousel extends StatelessWidget {
       width: double.infinity,
       color: AppColors.darkBg2,
       padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 60),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'DISNEY',
-            style: TextStyle(
-              color: AppColors.disney_blue,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              letterSpacing: 2,
+          Text('DISNEY+', style: TextStyle(color: AppColors.disney_blue, fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 3)),
+          SizedBox(height: 15),
+          Text('© 2024 Disney. Todos los derechos reservados. Aplicación de Práctica Profesional.', 
+          style: TextStyle(color: AppColors.grey, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================
+// 2. VISTA DE PERSONAJES (CON HERO PROMOCIONAL)
+// ============================================================
+class CharactersPage extends StatelessWidget {
+  const CharactersPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final characters = DisneyData.allCharacters;
+
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(title: const Text("PERSONAJES", style: TextStyle(letterSpacing: 2, fontSize: 14))),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // HERO DE PROMOCIONES
+            _buildPromoHero(),
+            const SizedBox(height: 40),
+            // GRID DE PERSONAJES
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Wrap(
+                spacing: 20,
+                runSpacing: 25,
+                children: characters.map((char) => _buildCharacterCard(char)).toList(),
+              ),
             ),
+            const SizedBox(height: 50),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPromoHero() {
+    return Container(
+      height: 500,
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: NetworkImage('https://wallpaperaccess.com/full/1125206.jpg'), // Daredevil Promo
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+            colors: [AppColors.darkBg2, Colors.transparent],
           ),
-          const SizedBox(height: 15),
-          const Text(
-            '© 2024 Disney. Todos los derechos reservados. Aplicación desarrollada para fines educativos.',
-            style: TextStyle(color: AppColors.grey, fontSize: 12),
+        ),
+        padding: const EdgeInsets.all(60),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('PRÓXIMAMENTE', style: TextStyle(color: AppColors.disney_blue, fontWeight: FontWeight.bold)),
+            const Text('DAREDEVIL: BORN AGAIN', style: TextStyle(color: Colors.white, fontSize: 45, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            const Text('La nueva serie original llega este año a Disney+.', style: TextStyle(color: Colors.white70, fontSize: 18)),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black),
+              child: const Text('MÁS INFORMACIÓN'),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCharacterCard(DisneyCharacter char) {
+    return Container(
+      width: 160,
+      decoration: BoxDecoration(color: const Color(0xFF232938), borderRadius: BorderRadius.circular(10)),
+      child: Column(
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+            child: Image.network(char.imageUrl, height: 200, width: 160, fit: BoxFit.cover),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Text(char.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
           ),
         ],
       ),
@@ -132,94 +208,91 @@ class HomeScreenWithCarousel extends StatelessWidget {
 }
 
 // ============================================================
-// 2. VISTA DE CATÁLOGO (CON SINGLE CHILD SCROLL VIEW)
+// 3. CATÁLOGO GENÉRICO (PELÍCULAS O SERIES)
 // ============================================================
-class CatalogPage extends StatelessWidget {
-  const CatalogPage({Key? key}) : super(key: key);
+class GenericCatalogPage extends StatelessWidget {
+  final String type;
+  const GenericCatalogPage({Key? key, required this.type}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final allMovies = DisneyData.allContent;
+    final String typeKey = type == 'Películas' ? 'movie' : 'series';
+    final items = DisneyData.allContent.where((c) => c.type == typeKey).toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "CATÁLOGO COMPLETO",
-          style: TextStyle(color: Colors.white, fontSize: 16, letterSpacing: 2),
+      appBar: AppBar(title: Text(type.toUpperCase())),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(30),
+        child: Wrap(
+          spacing: 20,
+          runSpacing: 30,
+          children: items.map((item) => _buildMovieCard(context, item)).toList(),
         ),
       ),
-      body: SingleChildScrollView( // <-- Scroll solicitado
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Todas las Películas y Series",
-              style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+    );
+  }
+
+  Widget _buildMovieCard(BuildContext context, DisneyContent item) {
+    return GestureDetector(
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(movie: item))),
+      child: Column(
+        children: [
+          Container(
+            width: 150,
+            height: 220,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              image: DecorationImage(image: NetworkImage(item.poster), fit: BoxFit.cover),
             ),
-            const SizedBox(height: 30),
-            // Usamos un Wrap para crear una cuadrícula flexible
-            Wrap(
-              spacing: 20,
-              runSpacing: 30,
-              children: allMovies.map((movie) {
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => DetailsPage(movie: movie)),
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 170,
-                        height: 250,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          image: DecorationImage(
-                            image: NetworkImage(movie.poster),
-                            fit: BoxFit.cover,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            )
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        width: 170,
-                        child: Text(
-                          movie.title,
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(width: 150, child: Text(item.title, style: const TextStyle(color: Colors.white), textAlign: TextAlign.center, overflow: TextOverflow.ellipsis)),
+        ],
       ),
     );
   }
 }
 
 // ============================================================
-// 3. VISTA DE DETALLES (FINALIZADA)
+// 4. DETALLES Y REPRODUCTOR
 // ============================================================
 class DetailsPage extends StatelessWidget {
   final DisneyContent movie;
-
   const DetailsPage({Key? key, required this.movie}) : super(key: key);
+
+  void _showPlayer(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black,
+      builder: (context) => Dialog.fullscreen(
+        backgroundColor: Colors.black,
+        child: Column(
+          children: [
+            Align(
+              alignment: Alignment.topRight,
+              child: IconButton(icon: const Icon(Icons.close, color: Colors.white, size: 40), onPressed: () => Navigator.pop(context)),
+            ),
+            Expanded(
+              child: Center(
+                child: AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      CachedNetworkImage(imageUrl: movie.backdrop, fit: BoxFit.cover, width: double.infinity),
+                      Container(color: Colors.black45),
+                      const CircularProgressIndicator(color: AppColors.disney_blue),
+                      const Positioned(bottom: 20, child: Text("REPRODUCIENDO CONTENIDO...", style: TextStyle(color: Colors.white, letterSpacing: 2))),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -228,75 +301,32 @@ class DetailsPage extends StatelessWidget {
       appBar: AppBar(backgroundColor: Colors.transparent),
       body: Stack(
         children: [
-          // Fondo de la película (Backdrop)
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage(movie.backdrop),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          // Degradado para legibilidad del texto
+          Image.network(movie.backdrop, width: double.infinity, height: double.infinity, fit: BoxFit.cover),
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
-                colors: [
-                  Colors.black.withOpacity(0.9),
-                  Colors.black.withOpacity(0.5),
-                  Colors.transparent,
-                ],
+                colors: [Colors.black.withOpacity(0.9), Colors.transparent],
               ),
             ),
           ),
-          // Información de la película
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 60.0),
+            padding: const EdgeInsets.symmetric(horizontal: 60),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  movie.type.toUpperCase(),
-                  style: const TextStyle(
-                    color: AppColors.disney_blue,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  movie.title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 55,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                Text(movie.type.toUpperCase(), style: const TextStyle(color: AppColors.disney_blue, fontWeight: FontWeight.bold)),
+                Text(movie.title, style: const TextStyle(color: Colors.white, fontSize: 50, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
-                Text(
-                  movie.description,
-                  style: const TextStyle(color: Colors.white70, fontSize: 18, height: 1.5),
-                ),
-                const SizedBox(height: 30),
-                Text(
-                  "Director: ${movie.director}",
-                  style: const TextStyle(color: AppColors.disney_gold, fontSize: 16),
-                ),
+                SizedBox(width: 500, child: Text(movie.description, style: const TextStyle(color: Colors.white70, fontSize: 18))),
                 const SizedBox(height: 40),
                 ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.play_arrow, size: 30),
-                  label: const Text('REPRODUCIR AHORA'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                  ),
+                  onPressed: () => _showPlayer(context),
+                  icon: const Icon(Icons.play_arrow),
+                  label: const Text("VER AHORA"),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, padding: const EdgeInsets.all(20)),
                 ),
               ],
             ),

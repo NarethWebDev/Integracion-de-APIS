@@ -7,10 +7,10 @@ class NewMoviesSection extends StatefulWidget {
   final Function(DisneyContent) onContentSelected;
 
   const NewMoviesSection({
-    Key? key,
+    super.key,
     required this.contents,
     required this.onContentSelected,
-  }) : super(key: key);
+  });
 
   @override
   State<NewMoviesSection> createState() => _NewMoviesSectionState();
@@ -48,7 +48,7 @@ class _NewMoviesSectionState extends State<NewMoviesSection> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        AppColors.darkBg2.withOpacity(0.7),
+                        AppColors.darkBg2.withValues(alpha: 0.7),
                         AppColors.darkBg2,
                       ],
                     ),

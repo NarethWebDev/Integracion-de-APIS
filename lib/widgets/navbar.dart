@@ -6,10 +6,10 @@ class Navbar extends StatefulWidget {
   final Function(String) onNavItemTap;
 
   const Navbar({
-    Key? key,
+    super.key,
     required this.onSearchTap,
     required this.onNavItemTap,
-  }) : super(key: key);
+  });
 
   @override
   State<Navbar> createState() => _NavbarState();
@@ -71,6 +71,8 @@ class _NavbarState extends State<Navbar> {
                   _buildNavItem('Series'),
                   const SizedBox(width: 30),
                   _buildNavItem('Música'),
+                  const SizedBox(width: 30),
+                  _buildNavItem('Personajes'),
                   const SizedBox(width: 30),
                   _buildNavItem('Espectáculos'),
                 ],
