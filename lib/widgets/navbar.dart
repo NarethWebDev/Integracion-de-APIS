@@ -24,7 +24,7 @@ class _NavbarState extends State<Navbar> {
 
     return Container(
       height: 70,
-      color: AppColors.darkBg,
+      color: AppColors.darkBg2,
       padding: EdgeInsets.symmetric(
         horizontal: isDesktop ? 40 : 20,
         vertical: 10,

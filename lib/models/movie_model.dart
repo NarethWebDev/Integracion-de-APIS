@@ -3,6 +3,7 @@ class DisneyContent {
   final String title;
   final String year;
   final String poster;
+  final String backdrop; // <--- Nueva propiedad para el fondo
   final String type; 
   final String description;
   final List<String> genres;
@@ -14,6 +15,7 @@ class DisneyContent {
     required this.title,
     required this.year,
     required this.poster,
+    required this.backdrop, // <--- Requerido
     required this.type,
     required this.description,
     required this.genres,
@@ -27,6 +29,7 @@ class DisneyContent {
       title: json['title'] ?? 'Unknown',
       year: json['year'] ?? 'N/A',
       poster: json['poster'] ?? '',
+      backdrop: json['backdrop'] ?? '',
       type: json['type'] ?? 'movie',
       description: json['description'] ?? '',
       genres: List<String>.from(json['genres'] ?? []),
