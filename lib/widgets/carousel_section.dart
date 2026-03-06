@@ -9,10 +9,10 @@ class CarouselSection extends StatefulWidget {
   final Function(DisneyContent) onContentSelected;
 
   const CarouselSection({
-    Key? key,
+    super.key,
     required this.contents,
     required this.onContentSelected,
-  }) : super(key: key);
+  });
 
   @override
   State<CarouselSection> createState() => _CarouselSectionState();
@@ -84,9 +84,9 @@ class _CarouselSectionState extends State<CarouselSection> {
           // ============================================================
           Positioned.fill(
             child: Opacity(
-              opacity: 0.2, // <--- Ajusta aquí la opacidad (0.0 a 1.0)
+              opacity: 0.2,
               child: CachedNetworkImage(
-                imageUrl: widget.contents[_currentIndex].backdrop, // Usamos la imagen de fondo
+                imageUrl: widget.contents[_currentIndex].backdrop,
                 fit: BoxFit.cover,
                 errorWidget: (context, url, error) => Container(color: Colors.black),
               ),
@@ -101,8 +101,8 @@ class _CarouselSectionState extends State<CarouselSection> {
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                   colors: [
-                    AppColors.darkBg2.withOpacity(0.9),
-                    AppColors.darkBg2.withOpacity(0.4),
+                    AppColors.darkBg2.withValues(alpha: 0.9),
+                    AppColors.darkBg2.withValues(alpha: 0.4),
                     Colors.transparent,
                   ],
                 ),
@@ -137,9 +137,9 @@ class _CarouselSectionState extends State<CarouselSection> {
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
               colors: [
-                Colors.black.withOpacity(0.95),
-                Colors.black.withOpacity(0.7),
-                Colors.black.withOpacity(0.4),
+                Colors.black.withValues(alpha: 0.95),
+                Colors.black.withValues(alpha: 0.7),
+                Colors.black.withValues(alpha: 0.4),
                 Colors.transparent,
               ],
               stops: const [0.0, 0.3, 0.6, 1.0],
