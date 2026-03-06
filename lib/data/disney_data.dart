@@ -1,10 +1,8 @@
 import '../models/movie_model.dart';
 
 class DisneyData {
-  // ============================================================
-  // ============================================================
+ 
   static final List<DisneyContent> allContent = [
-    // --- TUS PELÍCULAS ORIGINALES ---
     DisneyContent(
       id: '1',
       title: 'Frozen II',
@@ -81,9 +79,9 @@ class DisneyData {
       title: 'Elementos',
       year: '2023',
       poster:
-          'https://purodiseno.lat/wp-content/uploads/2023/09/ELEMENTOS-POSTER-.jpg',
+          'https://static.wikia.nocookie.net/doblaje/images/9/90/FwRd38GWwAIEmWb.jpeg/revision/latest?cb=20230516195534&path-prefix=es',
       backdrop:
-          'https://cadenaser.com/resizer/v2/6DOR626ASZGEDLHFVDOTP2EJT4.jpg?auth=fe54a80cc9512727e7d748ecf2217b5192cd875aef342b1b24f0b1ad4d902932',
+          'https://lumiere-a.akamaihd.net/v1/images/lineup_my-element_03_5368a525.jpeg?region=0,1,1200,675&width=960',
       type: 'movie',
       description: 'En una ciudad donde los elementos conviven.',
       genres: ['Animación', 'Familia', 'Comedia'],
@@ -95,9 +93,9 @@ class DisneyData {
       title: 'Toy Story 4',
       year: '2019',
       poster:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwDIjEoDK0n7sWZHGWJlrLqfq8v6OqWX_Wig&s',
+          'https://static.wikia.nocookie.net/doblaje/images/9/9c/Toy_Story_4_Mexican_poster.jpg/revision/latest?cb=20211019194314&path-prefix=es',
       backdrop:
-          'https://lumiere-a.akamaihd.net/v1/images/toy-story-4-background_ab0c7920.jpeg',
+          'https://lumiere-a.akamaihd.net/v1/images/eu_toy-story-4_article_edt-img_6_c7542590.jpeg?region=0,0,1200,621',
       type: 'movie',
       description:
           'Woody y su pandilla emprenden una nueva aventura cuando Bonnie entra a la escuela.',
@@ -110,9 +108,9 @@ class DisneyData {
       title: 'Coco',
       year: '2017',
       poster:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL_k7lXNJ5J5B5B5B5B5B5B5B5B5B5B5B5B5B&s',
+          'https://lumiere-a.akamaihd.net/v1/images/p_coco_19736_fd5fa537.jpeg?region=0,0,540,810',
       backdrop:
-          'https://lumiere-a.akamaihd.net/v1/images/coco-background_3ab6c8d5.jpeg',
+          'https://lumiere-a.akamaihd.net/v1/images/eu_coco_7things_gl_1_r_9d49785c.jpeg?region=0,0,1440,810',
       type: 'movie',
       description:
           'Miguel persigue su pasión por la música en el colorido mundo de Coco.',
@@ -125,9 +123,9 @@ class DisneyData {
       title: 'Aladdin',
       year: '2019',
       poster:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0lZ1X1X1X1X1X1X1X1X1X1X1X1X1X1X1X1X&s',
+          'https://i.ebayimg.com/images/g/RuwAAMXQrhdTWox-/s-l1200.jpg',
       backdrop:
-          'https://lumiere-a.akamaihd.net/v1/images/aladdin-background_c9b9c9d9.jpeg',
+          'https://www.enter.co/wp-content/uploads/2016/10/aladdin-1992.jpg',
       type: 'movie',
       description:
           'Un joven ladrón descubre un poder mágico y se enamora de una princesa.',
@@ -140,9 +138,9 @@ class DisneyData {
       title: 'La Reina de las Nieves',
       year: '2013',
       poster:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_T_T_T_T_T_T_T_T_T_T_T_T_T_T_T_T_T&s',
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyvWOGeyaGQZHHJjT6hDrYfrP9AcUBE-D46g&s',
       backdrop:
-          'https://lumiere-a.akamaihd.net/v1/images/frozen-background_a9a8c8d8.jpeg',
+          'https://cinefreaks.net/2023/wp-content/uploads/2019/12/La-reina-de-las-nieves-Frozen-no-es-la-%C3%BAnica-01.jpg',
       type: 'movie',
       description:
           'La primera aventura de Elsa, Anna y Olaf en un reino helado.',
@@ -155,9 +153,9 @@ class DisneyData {
       title: 'Raya y el Último Dragón',
       year: '2021',
       poster:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcX_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X&s',
+          'https://static.wikia.nocookie.net/doblaje/images/e/e2/Raya_poster2.jpg/revision/latest?cb=20210413234529&path-prefix=es',
       backdrop:
-          'https://lumiere-a.akamaihd.net/v1/images/raya-background_b9b8c8d8.jpeg',
+          'https://uvn-brightspot.s3.amazonaws.com/assets/vixes/r/raya_y_el_ultimo_dragon_raya_y_sisu.jpg',
       type: 'movie',
       description: 'Raya busca el último dragón para salvar su mundo.',
       genres: ['Animación', 'Aventura', 'Acción'],
@@ -169,9 +167,9 @@ class DisneyData {
       title: 'Mundo de Pixar',
       year: '2020',
       poster:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcY_Y_Y_Y_Y_Y_Y_Y_Y_Y_Y_Y_Y_Y_Y_Y_Y_Y&s',
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbOWP2-BVpj70pF7uMLaU_3VZwiWrdWmu1aA&s',
       backdrop:
-          'https://lumiere-a.akamaihd.net/v1/images/pixar-background_c9c8c8d8.jpeg',
+          'https://proyectoduas.com/wp-content/uploads/2024/02/dsc04432.jpg',
       type: 'movie',
       description:
           'Un alma viaja a través de mundos extraordinarios descubriendo su propósito.',
@@ -184,9 +182,9 @@ class DisneyData {
       title: 'Hercules',
       year: '1997',
       poster:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcZ_Z_Z_Z_Z_Z_Z_Z_Z_Z_Z_Z_Z_Z_Z_Z_Z_Z&s',
+          'https://static.wikia.nocookie.net/disney/images/6/66/Hercules_ver2_xlg.jpg/revision/latest?cb=20160923023455&path-prefix=es',
       backdrop:
-          'https://lumiere-a.akamaihd.net/v1/images/hercules-background_d9d8d8d8.jpeg',
+          'https://hips.hearstapps.com/hmg-prod/images/hercules-disney-1997-1668514681.jpg?crop=0.936xw:0.832xh;0.0636xw,0&resize=1200:*',
       type: 'movie',
       description:
           'Hércules descubre su verdadero origen y se convierte en un héroe.',
@@ -199,9 +197,9 @@ class DisneyData {
       title: 'La Bella y la Bestia',
       year: '1991',
       poster:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcA_A_A_A_A_A_A_A_A_A_A_A_A_A_A_A_A_A&s',
+          'https://static.wikia.nocookie.net/doblaje/images/4/40/B%26BP.jpg/revision/latest?cb=20170317001750&path-prefix=es',
       backdrop:
-          'https://lumiere-a.akamaihd.net/v1/images/beauty-background_e9e8e8d8.jpeg',
+          'https://lumiere-a.akamaihd.net/v1/images/b7902dabddffa9551cf191d151869dd899-14-beauty-and-the-be_79038e63.jpeg?region=0,75,1200,480',
       type: 'movie',
       description: 'Bella se enamora de la Bestia en su castillo encantado.',
       genres: ['Animación', 'Aventura', 'Familia'],
@@ -209,7 +207,6 @@ class DisneyData {
       director: 'Gary Trousdale',
     ),
 
-    // --- NUEVAS 15 SERIES (Diferentes a películas) ---
     DisneyContent(
       id: 's1',
       title: 'Loki',
