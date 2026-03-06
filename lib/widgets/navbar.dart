@@ -121,9 +121,9 @@ class _NavbarState extends State<Navbar> {
                     child: InkWell(
                       onTap: () {
                       },
-                      child: Row(
+                      child: const Row(
                         mainAxisSize: MainAxisSize.min,
-                        children: const [
+                        children: [
                           Icon(
                             Icons.card_membership,
                             color: AppColors.white,

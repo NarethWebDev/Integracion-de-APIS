@@ -4,7 +4,7 @@ class DisneyContent {
   final String year;
   final String poster;
   final String backdrop; // <--- Nueva propiedad para el fondo
-  final String type; 
+  final String type;
   final String description;
   final List<String> genres;
   final double rating;
@@ -37,10 +37,24 @@ class DisneyContent {
       director: json['director'] ?? 'Unknown',
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'year': year,
+      'poster': poster,
+      'backdrop': backdrop,
+      'type': type,
+      'description': description,
+      'genres': genres,
+      'rating': rating,
+      'director': director,
+    };
+  }
 }
 
 class ContentFilter {
-
   final String name;
   final String value;
   final bool isSelected;
@@ -74,4 +88,24 @@ class DisneyCharacter {
     required this.movieTitle,
     this.description = '',
   });
+
+  factory DisneyCharacter.fromJson(Map<String, dynamic> json) {
+    return DisneyCharacter(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      imageUrl: json['imageUrl'] ?? '',
+      movieTitle: json['movieTitle'] ?? '',
+      description: json['description'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'imageUrl': imageUrl,
+      'movieTitle': movieTitle,
+      'description': description,
+    };
+  }
 }
