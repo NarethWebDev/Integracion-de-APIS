@@ -49,16 +49,22 @@ class ApiService {
   // Obtener todos los personajes
   static Future<List<DisneyCharacter>> getCharacters() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/api/characters'));
+      final response =
+          await http.get(Uri.parse('https://api.disneyapi.dev/character'));
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        final List<dynamic> data = jsonResponse['data'];
         return data
             .map((character) => DisneyCharacter(
-                  id: character['id'],
-                  name: character['name'],
-                  imageUrl: character['imageUrl'],
-                  movieTitle: character['movieTitle'],
+                  id: character['_id'].toString(),
+                  name: character['name'] ?? '',
+                  imageUrl: character['imageUrl'] ?? '',
+                  movieTitle:
+                      (character['films'] as List<dynamic>?)?.isNotEmpty == true
+                          ? character['films'][0]
+                          : 'Sin película',
+                  description: 'Personaje de Disney',
                 ))
             .toList();
       } else {
@@ -73,7 +79,7 @@ class ApiService {
   // Obtener una película específica
   static Future<DisneyContent> getMovieById(String id) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/api/movies/$id'));
+      final response = await http.get(Uri.parse('https://devsapihub.com/api-movies/$id'));
 
       if (response.statusCode == 200) {
         final movie = jsonDecode(response.body);
