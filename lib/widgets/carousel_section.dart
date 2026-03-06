@@ -84,7 +84,7 @@ class _CarouselSectionState extends State<CarouselSection> {
           // ============================================================
           Positioned.fill(
             child: Opacity(
-              opacity: 0.3, // <--- Ajusta aquí la opacidad (0.0 a 1.0)
+              opacity: 0.2, // <--- Ajusta aquí la opacidad (0.0 a 1.0)
               child: CachedNetworkImage(
                 imageUrl: widget.contents[_currentIndex].backdrop, // Usamos la imagen de fondo
                 fit: BoxFit.cover,
@@ -160,7 +160,7 @@ class _CarouselSectionState extends State<CarouselSection> {
           top: 80,
           child: AnimatedOpacity(
             duration: const Duration(milliseconds: 600),
-            opacity: isActive ? 1.0 : 0.0,
+            opacity: isActive ? 0.5 : 0.0,
             child: SizedBox(
               width: 500,
               child: Column(
