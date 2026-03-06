@@ -70,9 +70,7 @@ class _NavbarState extends State<Navbar> {
                   const SizedBox(width: 30),
                   _buildNavItem('Series'),
                   const SizedBox(width: 30),
-                  _buildNavItem('Personajes'),
-                  const SizedBox(width: 30),
-                  _buildNavItem('Espectáculos'),
+                  _buildNavItem('Personajes')
                 ],
               ),
             ),
