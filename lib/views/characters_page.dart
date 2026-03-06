@@ -6,7 +6,7 @@ import '../models/movie_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class CharactersPage extends StatelessWidget {
-  const CharactersPage({Key? key}) : super(key: key);
+  const CharactersPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,8 @@ class CharactersPage extends StatelessWidget {
         elevation: 0,
       ),
       extendBodyBehindAppBar: true, // Para que el Hero suba hasta arriba
-      body: SingleChildScrollView( // <-- Habilitamos scroll para toda la página
+      body: SingleChildScrollView(
+        // <-- Habilitamos scroll para toda la página
         child: Column(
           children: [
             // ============================================================
@@ -35,7 +36,8 @@ class CharactersPage extends StatelessWidget {
               decoration: const BoxDecoration(
                 image: DecorationImage(
                   // Imagen de fondo promocional (ej: Daredevil)
-                  image: NetworkImage('https://images.marvel.com/content/1x/004dsh_ons_crd_02.jpg'),
+                  image: NetworkImage(
+                      'https://images.marvel.com/content/1x/004dsh_ons_crd_02.jpg'),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -66,13 +68,19 @@ class CharactersPage extends StatelessWidget {
                           color: Colors.white,
                           child: const Text(
                             'PRÓXIMAMENTE',
-                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12),
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12),
                           ),
                         ),
                         const SizedBox(height: 15),
                         const Text(
                           'DAREDEVIL: BORN AGAIN',
-                          style: TextStyle(color: Colors.white, fontSize: 50, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 50,
+                              fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 15),
                         const Text(
@@ -82,8 +90,14 @@ class CharactersPage extends StatelessWidget {
                         const SizedBox(height: 30),
                         ElevatedButton(
                           onPressed: () {},
-                          style: ElevatedButton.styleFrom(backgroundColor: AppColors.disney_blue, padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15)),
-                          child: const Text('SUSCRÍBETE AHORA', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.disney_blue,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 30, vertical: 15)),
+                          child: const Text('SUSCRÍBETE AHORA',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
@@ -119,7 +133,8 @@ class CharactersPage extends StatelessWidget {
     return Container(
       width: 170, // Ancho de la tarjeta
       decoration: BoxDecoration(
-        color: const Color(0xFF232938), // Un gris ligeramente más claro que el fondo
+        color: const Color(
+            0xFF232938), // Un gris ligeramente más claro que el fondo
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
@@ -134,14 +149,17 @@ class CharactersPage extends StatelessWidget {
         children: [
           // Imagen del personaje con ClipRRect para esquinas redondeadas
           ClipRRect(
-            borderRadius: const BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+            borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(8), topRight: Radius.circular(8)),
             child: CachedNetworkImage(
               imageUrl: character.imageUrl,
               height: 250, // Altura de la imagen
               width: double.infinity,
               fit: BoxFit.cover,
-              placeholder: (context, url) => Container(color: AppColors.darkGrey),
-              errorWidget: (context, url, error) => const Icon(Icons.person, color: Colors.white, size: 50),
+              placeholder: (context, url) =>
+                  Container(color: AppColors.darkGrey),
+              errorWidget: (context, url, error) =>
+                  const Icon(Icons.person, color: Colors.white, size: 50),
             ),
           ),
           // Info del personaje
@@ -152,14 +170,20 @@ class CharactersPage extends StatelessWidget {
               children: [
                 Text(
                   character.name,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 5),
                 Text(
                   character.movieTitle.toUpperCase(),
-                  style: const TextStyle(color: AppColors.lightGrey, fontSize: 12, letterSpacing: 1),
+                  style: const TextStyle(
+                      color: AppColors.lightGrey,
+                      fontSize: 12,
+                      letterSpacing: 1),
                 ),
               ],
             ),

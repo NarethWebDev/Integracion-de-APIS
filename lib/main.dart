@@ -8,13 +8,15 @@ import 'widgets/carousel_section.dart';
 import 'widgets/new_movies_section.dart';
 import 'data/disney_data.dart';
 import 'models/movie_model.dart';
+import 'views/movies_page.dart';
+import 'services/api_service.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +41,21 @@ class MyApp extends StatelessWidget {
 // ============================================================
 // 1. PANTALLA PRINCIPAL (HOME)
 // ============================================================
-class HomeScreenWithCarousel extends StatelessWidget {
-  const HomeScreenWithCarousel({Key? key}) : super(key: key);
+class HomeScreenWithCarousel extends StatefulWidget {
+  const HomeScreenWithCarousel({super.key});
+
+  @override
+  State<HomeScreenWithCarousel> createState() => _HomeScreenWithCarouselState();
+}
+
+class _HomeScreenWithCarouselState extends State<HomeScreenWithCarousel> {
+  late Future<List<DisneyContent>> moviesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    moviesFuture = ApiService.getMovies();
+  }
 
   void _navigateToDetails(BuildContext context, DisneyContent movie) {
     Navigator.push(
@@ -51,46 +66,100 @@ class HomeScreenWithCarousel extends StatelessWidget {
 
   void _navigateToCatalog(BuildContext context, String type) {
     if (type == 'Personajes') {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const CharactersPage()));
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const CharactersPage()));
+    } else if (type == 'Películas') {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => const MoviesPage()));
     } else {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => GenericCatalogPage(type: type)));
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => GenericCatalogPage(type: type)));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final featuredMovies = DisneyData.getFeatured();
-    final allContent = DisneyData.allContent;
-
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // NAVBAR CON LÓGICA DE NAVEGACIÓN COMPLETA
-            Navbar(
-              onSearchTap: () {},
-              onNavItemTap: (navItem) {
-                if (navItem == 'Películas' || navItem == 'Series' || navItem == 'Personajes') {
-                  _navigateToCatalog(context, navItem);
-                }
-              },
-            ),
+      body: FutureBuilder<List<DisneyContent>>(
+        future: moviesFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  CircularProgressIndicator(color: AppColors.disney_blue),
+                  SizedBox(height: 20),
+                  Text('Cargando catálogo...',
+                      style: TextStyle(color: Colors.white)),
+                ],
+              ),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Error al cargar películas',
+                      style: TextStyle(color: Colors.white)),
+                  const SizedBox(height: 10),
+                  Text('${snapshot.error}',
+                      style:
+                          const TextStyle(color: AppColors.grey, fontSize: 12),
+                      textAlign: TextAlign.center),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        moviesFuture = ApiService.getMovies();
+                      });
+                    },
+                    child: const Text('Reintentar'),
+                  ),
+                ],
+              ),
+            );
+          }
 
-            // CARRUSEL DE DESTACADOS
-            CarouselSection(
-              contents: featuredMovies,
-              onContentSelected: (content) => _navigateToDetails(context, content),
-            ),
+          final movies = snapshot.data ?? [];
+          final featuredMovies = movies.take(5).toList();
 
-            // SECCIÓN DE NOVEDADES
-            NewMoviesSection(
-              contents: allContent,
-              onContentSelected: (content) => _navigateToDetails(context, content),
-            ),
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                // NAVBAR CON LÓGICA DE NAVEGACIÓN COMPLETA
+                Navbar(
+                  onSearchTap: () {},
+                  onNavItemTap: (navItem) {
+                    if (navItem == 'Películas' ||
+                        navItem == 'Series' ||
+                        navItem == 'Personajes') {
+                      _navigateToCatalog(context, navItem);
+                    }
+                  },
+                ),
 
-            _buildFooter(),
-          ],
-        ),
+                // CARRUSEL DE DESTACADOS
+                CarouselSection(
+                  contents: featuredMovies,
+                  onContentSelected: (content) =>
+                      _navigateToDetails(context, content),
+                ),
+
+                // SECCIÓN DE NOVEDADES
+                NewMoviesSection(
+                  contents: movies,
+                  onContentSelected: (content) =>
+                      _navigateToDetails(context, content),
+                ),
+
+                _buildFooter(),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -103,10 +172,16 @@ class HomeScreenWithCarousel extends StatelessWidget {
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('DISNEY+', style: TextStyle(color: AppColors.disney_blue, fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 3)),
+          Text('DISNEY+',
+              style: TextStyle(
+                  color: AppColors.disney_blue,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  letterSpacing: 3)),
           SizedBox(height: 15),
-          Text('© 2024 Disney. Todos los derechos reservados. Aplicación de Práctica Profesional.', 
-          style: TextStyle(color: AppColors.grey, fontSize: 12)),
+          Text(
+              '© 2024 Disney. Todos los derechos reservados. Aplicación de Práctica Profesional.',
+              style: TextStyle(color: AppColors.grey, fontSize: 12)),
         ],
       ),
     );
@@ -116,34 +191,89 @@ class HomeScreenWithCarousel extends StatelessWidget {
 // ============================================================
 // 2. VISTA DE PERSONAJES (CON HERO PROMOCIONAL)
 // ============================================================
-class CharactersPage extends StatelessWidget {
-  const CharactersPage({Key? key}) : super(key: key);
+class CharactersPage extends StatefulWidget {
+  const CharactersPage({super.key});
+
+  @override
+  State<CharactersPage> createState() => _CharactersPageState();
+}
+
+class _CharactersPageState extends State<CharactersPage> {
+  late Future<List<DisneyCharacter>> charactersFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    charactersFuture = ApiService.getCharacters();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final characters = DisneyData.allCharacters;
-
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(title: const Text("PERSONAJES", style: TextStyle(letterSpacing: 2, fontSize: 14))),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // HERO DE PROMOCIONES
-            _buildPromoHero(),
-            const SizedBox(height: 40),
-            // GRID DE PERSONAJES
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Wrap(
-                spacing: 20,
-                runSpacing: 25,
-                children: characters.map((char) => _buildCharacterCard(char)).toList(),
+      appBar: AppBar(
+          title: const Text("PERSONAJES",
+              style: TextStyle(letterSpacing: 2, fontSize: 14))),
+      body: FutureBuilder<List<DisneyCharacter>>(
+        future: charactersFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  CircularProgressIndicator(color: AppColors.disney_blue),
+                  SizedBox(height: 20),
+                  Text('Cargando personajes...',
+                      style: TextStyle(color: Colors.white)),
+                ],
               ),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Error al cargar personajes',
+                      style: TextStyle(color: Colors.white)),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        charactersFuture = ApiService.getCharacters();
+                      });
+                    },
+                    child: const Text('Reintentar'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          final characters = snapshot.data ?? [];
+
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                // HERO DE PROMOCIONES
+                _buildPromoHero(),
+                const SizedBox(height: 40),
+                // GRID DE PERSONAJES
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child: Wrap(
+                    spacing: 20,
+                    runSpacing: 25,
+                    children: characters
+                        .map((char) => _buildCharacterCard(char))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(height: 50),
+              ],
             ),
-            const SizedBox(height: 50),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -154,12 +284,13 @@ class CharactersPage extends StatelessWidget {
       width: double.infinity,
       decoration: const BoxDecoration(
         image: DecorationImage(
-          image: NetworkImage('https://wallpaperaccess.com/full/1125206.jpg'), // Daredevil Promo
+          image: NetworkImage(
+              'https://wallpaperaccess.com/full/1125206.jpg'), // Daredevil Promo
           fit: BoxFit.cover,
         ),
       ),
       child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,
@@ -171,14 +302,22 @@ class CharactersPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('PRÓXIMAMENTE', style: TextStyle(color: AppColors.disney_blue, fontWeight: FontWeight.bold)),
-            const Text('DAREDEVIL: BORN AGAIN', style: TextStyle(color: Colors.white, fontSize: 45, fontWeight: FontWeight.bold)),
+            const Text('PRÓXIMAMENTE',
+                style: TextStyle(
+                    color: AppColors.disney_blue, fontWeight: FontWeight.bold)),
+            const Text('DAREDEVIL: BORN AGAIN',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 45,
+                    fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
-            const Text('La nueva serie original llega este año a Disney+.', style: TextStyle(color: Colors.white70, fontSize: 18)),
+            const Text('La nueva serie original llega este año a Disney+.',
+                style: TextStyle(color: Colors.white70, fontSize: 18)),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {},
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white, foregroundColor: Colors.black),
               child: const Text('MÁS INFORMACIÓN'),
             )
           ],
@@ -190,16 +329,22 @@ class CharactersPage extends StatelessWidget {
   Widget _buildCharacterCard(DisneyCharacter char) {
     return Container(
       width: 160,
-      decoration: BoxDecoration(color: const Color(0xFF232938), borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+          color: const Color(0xFF232938),
+          borderRadius: BorderRadius.circular(10)),
       child: Column(
         children: [
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-            child: Image.network(char.imageUrl, height: 200, width: 160, fit: BoxFit.cover),
+            child: Image.network(char.imageUrl,
+                height: 200, width: 160, fit: BoxFit.cover),
           ),
           Padding(
             padding: const EdgeInsets.all(10),
-            child: Text(char.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+            child: Text(char.name,
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center),
           ),
         ],
       ),
@@ -212,12 +357,13 @@ class CharactersPage extends StatelessWidget {
 // ============================================================
 class GenericCatalogPage extends StatelessWidget {
   final String type;
-  const GenericCatalogPage({Key? key, required this.type}) : super(key: key);
+  const GenericCatalogPage({super.key, required this.type});
 
   @override
   Widget build(BuildContext context) {
     final String typeKey = type == 'Películas' ? 'movie' : 'series';
-    final items = DisneyData.allContent.where((c) => c.type == typeKey).toList();
+    final items =
+        DisneyData.allContent.where((c) => c.type == typeKey).toList();
 
     return Scaffold(
       appBar: AppBar(title: Text(type.toUpperCase())),
@@ -226,7 +372,8 @@ class GenericCatalogPage extends StatelessWidget {
         child: Wrap(
           spacing: 20,
           runSpacing: 30,
-          children: items.map((item) => _buildMovieCard(context, item)).toList(),
+          children:
+              items.map((item) => _buildMovieCard(context, item)).toList(),
         ),
       ),
     );
@@ -234,7 +381,8 @@ class GenericCatalogPage extends StatelessWidget {
 
   Widget _buildMovieCard(BuildContext context, DisneyContent item) {
     return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(movie: item))),
+      onTap: () => Navigator.push(context,
+          MaterialPageRoute(builder: (context) => DetailsPage(movie: item))),
       child: Column(
         children: [
           Container(
@@ -242,11 +390,17 @@ class GenericCatalogPage extends StatelessWidget {
             height: 220,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              image: DecorationImage(image: NetworkImage(item.poster), fit: BoxFit.cover),
+              image: DecorationImage(
+                  image: NetworkImage(item.poster), fit: BoxFit.cover),
             ),
           ),
           const SizedBox(height: 8),
-          SizedBox(width: 150, child: Text(item.title, style: const TextStyle(color: Colors.white), textAlign: TextAlign.center, overflow: TextOverflow.ellipsis)),
+          SizedBox(
+              width: 150,
+              child: Text(item.title,
+                  style: const TextStyle(color: Colors.white),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis)),
         ],
       ),
     );
@@ -258,7 +412,7 @@ class GenericCatalogPage extends StatelessWidget {
 // ============================================================
 class DetailsPage extends StatelessWidget {
   final DisneyContent movie;
-  const DetailsPage({Key? key, required this.movie}) : super(key: key);
+  const DetailsPage({super.key, required this.movie});
 
   void _showPlayer(BuildContext context) {
     showDialog(
@@ -270,7 +424,9 @@ class DetailsPage extends StatelessWidget {
           children: [
             Align(
               alignment: Alignment.topRight,
-              child: IconButton(icon: const Icon(Icons.close, color: Colors.white, size: 40), onPressed: () => Navigator.pop(context)),
+              child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white, size: 40),
+                  onPressed: () => Navigator.pop(context)),
             ),
             Expanded(
               child: Center(
@@ -279,10 +435,18 @@ class DetailsPage extends StatelessWidget {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      CachedNetworkImage(imageUrl: movie.backdrop, fit: BoxFit.cover, width: double.infinity),
+                      CachedNetworkImage(
+                          imageUrl: movie.backdrop,
+                          fit: BoxFit.cover,
+                          width: double.infinity),
                       Container(color: Colors.black45),
-                      const CircularProgressIndicator(color: AppColors.disney_blue),
-                      const Positioned(bottom: 20, child: Text("REPRODUCIENDO CONTENIDO...", style: TextStyle(color: Colors.white, letterSpacing: 2))),
+                      const CircularProgressIndicator(
+                          color: AppColors.disney_blue),
+                      const Positioned(
+                          bottom: 20,
+                          child: Text("REPRODUCIENDO CONTENIDO...",
+                              style: TextStyle(
+                                  color: Colors.white, letterSpacing: 2))),
                     ],
                   ),
                 ),
@@ -301,7 +465,10 @@ class DetailsPage extends StatelessWidget {
       appBar: AppBar(backgroundColor: Colors.transparent),
       body: Stack(
         children: [
-          Image.network(movie.backdrop, width: double.infinity, height: double.infinity, fit: BoxFit.cover),
+          Image.network(movie.backdrop,
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.cover),
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -317,16 +484,30 @@ class DetailsPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(movie.type.toUpperCase(), style: const TextStyle(color: AppColors.disney_blue, fontWeight: FontWeight.bold)),
-                Text(movie.title, style: const TextStyle(color: Colors.white, fontSize: 50, fontWeight: FontWeight.bold)),
+                Text(movie.type.toUpperCase(),
+                    style: const TextStyle(
+                        color: AppColors.disney_blue,
+                        fontWeight: FontWeight.bold)),
+                Text(movie.title,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 50,
+                        fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
-                SizedBox(width: 500, child: Text(movie.description, style: const TextStyle(color: Colors.white70, fontSize: 18))),
+                SizedBox(
+                    width: 500,
+                    child: Text(movie.description,
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 18))),
                 const SizedBox(height: 40),
                 ElevatedButton.icon(
                   onPressed: () => _showPlayer(context),
                   icon: const Icon(Icons.play_arrow),
                   label: const Text("VER AHORA"),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, padding: const EdgeInsets.all(20)),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.all(20)),
                 ),
               ],
             ),
