@@ -63,7 +63,7 @@ class _NewMoviesSectionState extends State<NewMoviesSection> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                const Text(
                   'NUEVO EN DISNEY+',
                   style: TextStyle(
                     color: AppColors.disney_blue,

@@ -62,14 +62,28 @@ class _CarouselSectionState extends State<CarouselSection> {
   @override
   Widget build(BuildContext context) {
     if (widget.contents.isEmpty) {
+      // Lista vacía: mostramos carrusel de imágenes de reserva para no dejar
+      // el fondo en negro.
+      final fallback = [
+        'https://via.placeholder.com/800x450?text=Imagen+1',
+        'https://via.placeholder.com/800x450?text=Imagen+2',
+        'https://via.placeholder.com/800x450?text=Imagen+3',
+      ];
+
       return Container(
-        height: 500,
+        height: 550,
         color: AppColors.darkBg2,
-        child: const Center(
-          child: Text(
-            'No hay contenido disponible',
-            style: TextStyle(color: AppColors.white, fontSize: 18),
-          ),
+        child: PageView.builder(
+          itemCount: fallback.length,
+          itemBuilder: (context, index) {
+            return CachedNetworkImage(
+              imageUrl: fallback[index],
+              fit: BoxFit.cover,
+              placeholder: (c, u) => Container(color: Colors.black45),
+              errorWidget: (c, u, e) =>
+                  const Icon(Icons.broken_image, size: 60, color: Colors.white),
+            );
+          },
         ),
       );
     }
@@ -79,36 +93,27 @@ class _CarouselSectionState extends State<CarouselSection> {
       color: AppColors.darkBg2,
       child: Stack(
         children: [
-          // ============================================================
-          // NUEVO: FONDO CON IMAGEN DIFERENTE Y POCA OPACIDAD
-          // ============================================================
+          // FONDO CON IMAGEN
           Positioned.fill(
             child: Opacity(
-              opacity: 0.2,
+              opacity: 1.0,
               child: CachedNetworkImage(
-                imageUrl: widget.contents[_currentIndex].backdrop,
+                imageUrl: widget.contents[_currentIndex].backdrop.isNotEmpty
+                    ? widget.contents[_currentIndex].backdrop
+                    : widget.contents[_currentIndex].poster,
                 fit: BoxFit.cover,
-                errorWidget: (context, url, error) => Container(color: Colors.black),
+                placeholder: (c, u) => Container(color: Colors.black45),
+                errorWidget: (context, url, error) {
+                  final movie = widget.contents[_currentIndex];
+                  if (movie.poster.isNotEmpty) {
+                    return Image.network(movie.poster, fit: BoxFit.cover);
+                  }
+                  return Container(color: Colors.black);
+                },
               ),
             ),
           ),
 
-          // OVERLAY GRADIENTE (Para asegurar que el texto se vea bien)
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    AppColors.darkBg2.withValues(alpha: 0.9),
-                    AppColors.darkBg2.withValues(alpha: 0.4),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
           // CARRUSEL DE PELÍCULAS
           PageView.builder(
             controller: _pageController,
@@ -119,12 +124,10 @@ class _CarouselSectionState extends State<CarouselSection> {
               final isActive = index == _currentIndex;
               return _buildCarouselItem(movie, isActive);
             },
-          ),  
+          ),
         ],
       ),
     );
-
-
   }
 
   Widget _buildCarouselItem(DisneyContent movie, bool isActive) {
@@ -169,7 +172,8 @@ class _CarouselSectionState extends State<CarouselSection> {
                   const Text(
                     'PRÓXIMAMENTE',
                     style: TextStyle(
-                      color: Colors.amber, // He usado amber por AppColors.disney_gold
+                      color: Colors
+                          .amber, // He usado amber por AppColors.disney_gold
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2,
@@ -199,7 +203,8 @@ class _CarouselSectionState extends State<CarouselSection> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.disney_blue,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 15),
                     ),
                   ),
                 ],
@@ -221,11 +226,14 @@ class _CarouselSectionState extends State<CarouselSection> {
               height: 450,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: [BoxShadow(color: Colors.black54, blurRadius: 20)],
+                boxShadow: const [
+                  BoxShadow(color: Colors.black54, blurRadius: 20)
+                ],
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: CachedNetworkImage(imageUrl: movie.poster, fit: BoxFit.cover),
+                child: CachedNetworkImage(
+                    imageUrl: movie.poster, fit: BoxFit.cover),
               ),
             ),
           ),
